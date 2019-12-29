@@ -1,0 +1,412 @@
+for mounting Downloads on the VM after restarting 
+sudo mount -t vboxsf -o uid=501,gid=501 Labs Downloads/ 
+
+#########################################------------------------------------11/3/2019###########################################################################
+#Big data 
+	3 vs 
+	-->velocity
+	-->variety
+	-->volume
+Hadoop written in java programming
+
+#why Hadoop ?
+
+Distributed computing 
+	1 comp-->node
+	together  called as cluster 
+	ants analogy
+																	hadoop ecosystem
+	gfs(google file system)--> storage  							-->HDFS
+	MapReduce--> processing data across multiple servers 			-->Hadoop Mapreduce
+	Big table-->database management 								-->HBase
+	
+	HDFS+Hadoop MapReduce = Hadoop
+
+	mainly used for:
+	1. storage.
+	2. Processing.
+	3. analytics.
+	
+#Hadoop roles:
+Hadoop tools for developer:( java , python, Scala SQL)
+	MapReduce,Pig,spark,Hive Impla etc..
+Hadoop tools Administrator:(linux and DBA)
+	Ambari, cloudera manager ,Sentry, zookeeper
+Hadoop tools for data scientist: python|R, ML and Statistics.
+	Mahout, Spark ML-lib,Impala,Hive etc.
+Data migration:
+	flume,Sqoop, Kafka.
+
+#Gen 2 Hadoop:
+	= Fs Shell +HDFS+MapReduce+YARN
+FsShell-->Let's user interact with HDFS.
+HDFS --> Distributed file system.
+MapReduce--> Programming model for parallel processing.
+YARN --> MapReduce engine V2, for cluster resource management.
+
+#Hadoop Architecture:
+Hadoop is a master-slave architecture.
+HDFS daemons
+Gateway node--> client node.
+client way node will be running on all the nodes.
+all user interactions happens from client node.
+
+
+#Pseudo distribution Mode cluster.
+HDFS--> 
+	namenode(master)(NN)
+	datanode(slave)(DN)
+	secondary namenode(master)(SNN)
+YARN-->
+	RM -- resource manager(master)
+	NM -- node manager(slave)
+	
+NOTE: 	1 master/ cluster 
+	
+	
+#cloudera distribution --commercial
+#apache distribution--open source.
+
+note: HDFS is immutable (write once Read Many - WORM)
+	there is no update.
+
+#fault tolerance 
+secondary namenode is not the backup for ur namenode. --<> it is the  checkpoint node --> backup for the metadata. not the actual data backup.
+If the namenode crashes then the standby namenode will be created.
+hadoop rack awareness.
+
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||\
+
+MAP-REDUCE
+it is for the parallel processing.
+2 phases:
+	Map phase and reduce phase.
+steps followed in MapReduce:
+	Input split.
+	Map 
+	shuffle and sort
+	reduce
+	Final output.
+each and every step has IO.-->framework
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||\\
+Problem stmt: compute max close price / stock symbol
+
+logics:
+MAP-->transformation.
+REDUCE-->Aggregation.
+
+Map tasks run only on the nodes where the data resides and not on all the nodes.
+HDFS split doesn't respect logical boundaries of ur dataset. it will split into 128 MB 
+Input split--> can be customised.
+			   it takes into consideration of logical boundaries of ur dataset.
+
+MapReduce works on <K,V> (i/p an o/p are in key value pairs)
+
+overall logic  for stocks(mapreduce way):
+		Input split.
+		--> read each line.
+		MAPper
+		-->Split based on delimiter "'".
+			--> mark 2nd column as key (stock_symbol),and 7th column as th value (close_price)
+		shuffle and sort
+		-->group by key
+		-->Sort by key 
+			for each key a list of values will be prepared.
+		Reducer
+		-->for each key, pick a max value of cloudera
+		Final output.
+		-->write output
+
+each map task generates o/p -->intermediate results should be sorted and restored 
+
+to work with yarn -->hadoop yarn
+for HDFS --> hadoop fs
+
+analytics -->mapreduce
+processing --> YARN
+Storage   --> HDFS
+Ingest -->FsShell
+
+example for wordcount--> 
+key - value
+hadoop -5
+welcome 1...etc
+
+overall logic  for wordcount(mapreduce way):
+		Input split.
+		--> read each line.
+		MAPper
+		-->Split based on delimiter " ".
+			--> 
+		shuffle and sort
+		-->group by key
+		-->Sort by key 
+			for each key a list of values will be prepared.
+		Reducer
+		-->for each key, add the count 
+		Final output.
+		-->write output
+	
+output of mapper will be in the format of <k,v>
+ex,,, Hadoop , [1,1,1,1] -->mapper output
+	In reducer o/p --> Hadoop, 4(get iterated ---> iterable)
+	
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+HIVE:
+INTRNAL AND EXTERNAL 
+	internl -->actual data.
+	external--> meta data is present.
+#HiveQL libraries --> to convert unstructured into structured.'
+Lateral view and explode
+	explode--> to get the split results in 1 column.
+	Lateral view --> to create a view by executing inner join
+	
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sqoop : --> SQL to Hadoop 
+	-->RDBMs to hadoop import tools
+	-->data from RDBMS data sources into a hadoop cluster.
+	-->Abstraction to MapReduce.
+	
+	sqoop also runs MapReduce jobs
+	
+	so in training we just imported tables or database using sqoop :).
+	
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+#########################################-----------------------12/3/2019###########################################################################
+#YARN-->yet another resource negotiator 
+
+-RM -- resource manager(master)
+		has mainly 2 components:
+			-ApplicationsManager 
+			-scheduler 
+-NM -- node manager(slave) -->exists on every node.
+	
+-containers--> Compute resource--(CPU+RAM)
+	- map and reduce are actual units of execution.
+	- containers will be allocated for task execution.
+	- a container for map or reduce task is called Yarnchild.
+
+-pre-application applicationmaster
+	- first container for the job.
+	- negotiates with ApplicationsManager containers for jobs.
+	- 
+	
+container perspective--> ApplicationsManager
+	task:
+	- responsive for fault tolerance of applicationmaster.
+	- it is responsible for creating first applicationmaster and assigning 1st container.
+	- asks for the container for schedulers.
+	
+	
+jobs perspective--> applicationmaster
+	task:
+	- ask for resource.
+	- once resource is allocated then monitor 
+	
+
+	Resource manager contains:	
+		1 ApplcatiosManager tasks:
+			create application master for each job from a client and assign 1st container.
+			1st container can run on any of the node manager.
+		2 scheduler for allocating resource such as CPU etc..
+			creates container for mapper and reducer.
+			
+	applicationmaster tasks:
+			negotiates with NameNode and scheduler for creating yarnchild -->mapper jobs using 1st container created.
+			after completion of mapper jobs applicationmaster negotiates with scheduler for the reducer --> container.
+			after completion of reducer job--> which runs on single node(i/p from intermediate o/p).
+			then application master is responsible for :
+			- logs aggregation.
+			- job status.
+			- book keeping 
+			- kills the yarnchild or container after completion.
+	Hence after completion of above tasks applicationmaster is killed.
+	
+	resource manager contains information about the applicationmaster and logs 
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#Hive HQL;
+		schema on read.
+		run query from command prompt --> hive -e 'select * from orders limit 5'
+		#describe extended orders; ---> to find out whether the table is ordered , managed or extended etc..
+		
+#partitions in hive:
+
+running using non interactive way : hive -f Desktop/hivescript.sql
+difference between managed table and external table --> managed (drop and removed - removes/deletes the original table)--> restricted access will be given to drop by admins
+			external table --> just drops the external tables --> not the original one.drops the meta-data
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+#Impala
+	-faster-- local cache for meta-store. 
+when to use impala or hive:
+		- if the nodes failed ...then the query cannot be resubmitted by impala.
+		- fault tolerance is present for hive.
+		
+		Impala built in C++ and we cannot see the deamon process when executed jps command --> we need to do ps -ef | grep impala command
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#PIG
+-grunt shell is interactive mode: can execute FsShell --> fs -cat ...etc...
+pig is similar to ETL tool 
+	A = LOAD '/Stocks' USING PigStorage(','); --> no data processing happened here...pig only knows that it should execute stocks data
+triggers for pig scripts: 
+			DUMP- take from 
+			STORE- write into 
+
+MaxClosePrice--> using pig latin script inside code dir 
+
+start pig grunt shell --> pig
+to quit the pig grunt shell --> \q
+
+lazy evaluation..
+it first does logical then next step is executing mode.
+
+
+- non interactive mode 
+pig Downloads/code/MaxClosePricePig.txt
+
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+#SPARK:1.6.0
+- Spark is a general purpose large scale in-memory, distributed, unified data processing engine.
+-Spark is built by Scala programming language. 
+-These jobs can be written in python|Java| R|SQL.
+-Spark can read data from variety data sources --> HDFS, Cassandra,S3,HBase,local file system..etc.
+-Spark can use its own cluster manager |YARN|Mesos.
+difference between mapreduce ans spark:
+	- read data at once and store it the cache.
+	- but in MapReduce --> I/o at every level.
+#Scala:
+-OOP
+-Programming job not scripting 
+-Functional Programming.
+-Statically typed.
+-Runs in a JVM.
+
+cli--> spark-shell
+REPL-interactive shell.
+	- Read,Evaluate,Print,loop.
+	
+#SCALA-->
+- mutable and immutable variable.
+- immutable-val keyword. --ex val str="helloworld"
+- mutable-var keyword. --> reassigment is possible
+- As it is statically typed --> we cannot reassign one data type with others
+str. tab--> help or functions
+
+#RDD:
+-Resilient distributed Dataset.
+-Programming abstraction for Spark.
+-immutable.
+-in memory objects that can be operated in parallel.
+#########################################-----------------------13/3/2019###########################################################################
+RDD Operations (2 types)
+- Transformations (Lazily evaluated, no data processing)
+- Actions (A job is triggered)
+Let us read data from HDFS into an RDD
+scala> val baseRDD = sc.textFile("/Sample")
+'sc'--> Spark Context --> Connection to Spark cluster
+Transformations
+Actions
+- collect()
+- count()
+- first()
+- take(10)
+-take(10).foreach(print)
+
+ex :11 
+- word count using spark and scala:
+overall logic  for wordcount(mapreduce way):
+		
+		--> read each line.
+		-->Split based on delimiter " ".	
+		-->group by key
+		//spark doesnt do sorting -->Sort by key 
+			for each key a list of values will be prepared.
+		-->for each key, add the count 
+		-->write output
+this above logic must be programmed in scala programming.
+return type of any transformationwill be RDD.
+'=>' function 
+scala> val baseRDD = sc.textFile("/Sample")
+scala>val fmapRDD = baseRDD.flatMap(str=> str.split(" "))
+scala> val fmapRDD = baseRDD.map(str=> (str,1))
+
+scala> val countRDD = fmapRDD.reduceByKey((sum,index)=> sum+index) --> it does groupby function
+
+note:any RDD with key value pair is called as 'Pair RDD' or 'paired RDD'.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+final wordcount code:
+scala>val baseRDD = sc.textFile("/Sample")
+scala> val fmapRDD = baseRDD.flatMap(line=> line.split(" "))
+scala> val mapRDD = fmapRDD.map(word => (word,1))   // if replace word by line we get count according to line.
+scala> val countRDD = mapRDD.reduceByKey((sum,index)=> sum+index)
+scala>countRDD.collect()
+above is the wordcount program in scala --> in interactive mode.
+=> function operator 
+
+refactor the code:
+scala> sc.textFile("/Sample").flatMap(_.split(" ")).map((_,1)).reduceByKey(_+_).collect()
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+RDD dependency:
+-narrow
+-wide
+	
+	
+Spark architecture:
+	-Application
+	-jobs
+	-Spark context
+	-driver program
+	-cluster Manager
+	-Executor
+	-stages
+	-tasks
+	-worker
+	-cache
+default port :4040
+
+until u call an action there won't be any jobs creation  -no job for transformation
+
+whenever encounter --> wide dependency --> stages will be formed or created.
+narrow dependency--> on same node/cluster.
+wide dependency --> on different node or cluster.--> makes shuffles.
+
+spark caches the intermediate o/p --> so next execution will be faster.
+this cache is shared among different nodes--> hence distributed unified..
+caches are present  in executers 
+whenever there is a shuffle, then there is wide dependency.
+till now we talked about implicit cache.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+but we can also cache it externally.
+map -->vertical filter
+filter--> horizontal filter 
+sorting in scala
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+known knowns
+Known unknowns
+unknown unknowns 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Data frames in spark
+for running SQL 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+#FLUME
+flume agent
+	Source: gets data from
+	sink: where data needs to be written
+	channel:intermediate queue b/w source and sink 
+	
+tail -f /opt/gen_logs/logs/access.log --> log 	--> flume source
+	
+----------------------------------------------------------------------------------------------------------------------------------------------------------------	
+Zookeeper for HDFS is the super master 
+
+links:
+	https://drive.google.com/drive/folders/1EcbxCPiMfB9AImFSh0vxtjAIKQJ-HeA5
+	https://www.dropbox.com/sh/vow6w9z9pylf5z5/AACIB-0MmL7fF3UD3ExdLFDHa?dl=0
